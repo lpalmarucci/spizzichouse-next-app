@@ -1,46 +1,28 @@
 "use client";
 
 import * as React from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { signUpSchema } from "@/components/form/SignUp/SignUp.schema";
+import { registerUser } from "@/app/auth/actions";
+import { useFormState } from "react-dom";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import SubmitButton from "@/components/form/SubmitButton";
 
-const formSchema = z.object({
-  firstname: z
-    .string()
-    .min(2, {
-      message: "Firstname must be at least 2 characters.",
-    })
-    .max(20),
-  lastname: z
-    .string()
-    .min(2, {
-      message: "Lastname must be at least 2 characters.",
-    })
-    .max(25),
-  username: z
-    .string()
-    .min(2, {
-      message: "Username must be at least 2 characters.",
-    })
-    .max(50),
-  password: z
-    .string()
-    .min(8, {
-      message: "Password must be at least 8 characters.",
-    })
-    .max(20),
-});
-
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
+  onRegisterSuccess: () => void;
+}
 
 export function SignUpForm({ className, ...props }: UserAuthFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const router = useRouter();
+  const form = useForm<z.infer<typeof signUpSchema>>({
+    mode: "onChange",
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       firstname: "",
       lastname: "",
@@ -49,17 +31,24 @@ export function SignUpForm({ className, ...props }: UserAuthFormProps) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
+  const [state, formAction] = useFormState(registerUser, null);
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-  }
-
+  useEffect(() => {
+    if (state) {
+      if (state.status === "ko") {
+        toast({
+          title: state.message,
+          variant: "destructive",
+          duration: 1800,
+        });
+      } else {
+        props.onRegisterSuccess();
+      }
+    }
+  }, [state]);
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+      <form action={formAction} className="space-y-4">
         <FormField
           control={form.control}
           name="firstname"
@@ -106,15 +95,13 @@ export function SignUpForm({ className, ...props }: UserAuthFormProps) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="Password" {...field} />
+                <Input placeholder="Password" type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full mt-10">
-          Sign up
-        </Button>
+        <SubmitButton text="Sign up" isDisabled={!form.formState.isValid} />
       </form>
     </Form>
   );

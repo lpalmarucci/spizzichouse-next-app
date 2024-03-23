@@ -1,68 +1,51 @@
-'use client';
-
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { signOut, useSession } from 'next-auth/react';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { useTheme } from 'next-themes';
+} from "@/components/ui/dropdown-menu";
+import ToggleTheme from "@/components/ToggleTheme";
+import useClientSession from "@/hooks/useClientSession";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getInitialLetters } from "@/lib/utils";
+import { Icons } from "@/components/ui/icons";
+import React from "react";
+import { signOutAction } from "@/app/auth/actions";
 
 export default function UserMenu() {
-  const { data: session } = useSession();
-  const { setTheme, resolvedTheme } = useTheme();
-  if (!session) return;
+  const user = useClientSession();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="lg"
-          className="justify-start gap-4 hover:backgroud"
-        >
-          {session.user?.name}
-          <Avatar className="mr-2">
-            <AvatarImage
-              src={session.user?.image ?? ''}
-              height={25}
-              width={25}
-            />
+        <Button variant="ghost" className="justify-start hover:bg-transparent gap-4 hover:backgroud">
+          <Avatar>
+            <AvatarFallback>{getInitialLetters(user.firstname, user.lastname)}</AvatarFallback>
           </Avatar>
+          {user?.firstname} {user?.lastname}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>Email: {session.user?.email}</DropdownMenuLabel>
+      <DropdownMenuContent className="min-w-52 ">
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Settings</DropdownMenuLabel>
+          <DropdownMenuItem>
+            <ToggleTheme />
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.preventDefault();
-          }}
-        >
-          <div className="w-full flex justify-between items-center space-x-2">
-            <Label htmlFor="airplane-mode">Dark mode</Label>
-            <Switch
-              id="airplane-mode"
-              checked={resolvedTheme === 'dark'}
-              onCheckedChange={(e) => {
-                setTheme(resolvedTheme === 'light' ? 'dark' : 'light');
-              }}
-            />
-          </div>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className={'cursor-pointer'}
-          onClick={() => signOut({ callbackUrl: '/' })}
-        >
-          <span className="text-destructive">Logout</span>
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuItem className="cursor-pointer hover:bg-transparent" onClick={() => signOutAction()}>
+            <span className="flex gap-2 items-center text-destructive font-semibold">
+              <Icons.exit className="mr-2" />
+              Log out
+            </span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

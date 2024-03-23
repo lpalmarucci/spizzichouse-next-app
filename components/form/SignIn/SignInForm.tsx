@@ -1,40 +1,44 @@
 "use client";
 
 import * as React from "react";
-import { useForm, useFormState } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useFormState } from "react-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { signIn } from "@/app/auth/actions";
 import { signInSchema } from "@/components/form/SignIn/SignIn.schema";
+import SubmitButton from "@/components/form/SubmitButton";
+import { toast } from "@/components/ui/use-toast";
+import { signInAction } from "@/app/auth/actions";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function SignInForm({ className }: UserAuthFormProps) {
-  // const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const form = useForm<z.infer<typeof signInSchema>>({
+    mode: "onChange",
     resolver: zodResolver(signInSchema),
     defaultValues: {
       username: "",
       password: "",
     },
   });
-  const { isLoading, isValid } = useFormState({ control: form.control });
 
-  console.log({ isLoading, isValid });
+  const [state, formAction] = useFormState(signInAction, { message: "" });
 
-  function onSubmit(values: z.infer<typeof signInSchema>) {
-    // setIsLoading(true);
-    // setTimeout(() => {
-    //   setIsLoading(false);
-    // }, 3000);
-  }
+  useEffect(() => {
+    if (state.message !== "")
+      toast({
+        title: state.message,
+        variant: "destructive",
+        duration: 1800,
+      });
+  }, [state]);
 
   return (
     <Form {...form}>
-      <form action={signIn} className="space-y-8">
+      <form action={formAction} className="space-y-4">
         <FormField
           control={form.control}
           name="username"
@@ -55,15 +59,13 @@ export function SignInForm({ className }: UserAuthFormProps) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="Password" {...field} />
+                <Input placeholder="Password" type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Sign in
-        </Button>
+        <SubmitButton isDisabled={!form.formState.isValid} text="Sign in" />
       </form>
     </Form>
   );
