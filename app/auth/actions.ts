@@ -17,7 +17,7 @@ export async function signInAction(prevState: any, formData: FormData) {
 
     if (!parse.success) return { message: "Error validating the form" };
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/auth/login`, {
+    const response = await fetch(`${process.env.API_URL}/auth/login`, {
       body: JSON.stringify(parse.data),
       method: "POST",
       headers: {
@@ -60,7 +60,7 @@ export async function registerUser(prevState: any, formData: FormData): Promise<
 
     if (!parse.success) return { status: "ko", message: "Error while validating the form" };
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/users`, {
+    const response = await fetch(`${process.env.API_URL}/users`, {
       body: JSON.stringify(parse.data),
       method: "POST",
       headers: {
