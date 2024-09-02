@@ -21,7 +21,7 @@ interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
 export function SignUpForm({ className, ...props }: UserAuthFormProps) {
   const router = useRouter();
   const form = useForm<z.infer<typeof signUpSchema>>({
-    mode: "onChange",
+    mode: "onSubmit",
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       firstname: "",

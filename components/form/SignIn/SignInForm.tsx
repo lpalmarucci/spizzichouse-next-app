@@ -13,11 +13,11 @@ import SubmitButton from "@/components/form/SubmitButton";
 import { toast } from "@/components/ui/use-toast";
 import { signInAction } from "@/app/auth/actions";
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 export function SignInForm({ className }: UserAuthFormProps) {
   const form = useForm<z.infer<typeof signInSchema>>({
-    mode: "onChange",
+    mode: "onSubmit",
     resolver: zodResolver(signInSchema),
     defaultValues: {
       username: "",
