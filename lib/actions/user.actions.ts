@@ -3,7 +3,8 @@ import User from "@/lib/models/user.model";
 
 interface CreateUserDto {
   id: string;
-  name: string;
+  firstname: string;
+  lastname: string;
   username: string;
   image: string;
 }
@@ -25,5 +26,15 @@ export async function getUser(userId: string): Promise<User | null> {
     return User.findOne({ id: userId });
   } catch (error: any) {
     throw new Error(`Error while getting user: ${error.message}`);
+  }
+}
+
+export async function getUsers(): Promise<User[]> {
+  try {
+    await connectToDb();
+
+    return User.find();
+  } catch (error: any) {
+    throw new Error(`Error while getting users: ${error.message}`);
   }
 }
