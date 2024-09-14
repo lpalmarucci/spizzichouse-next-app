@@ -2,21 +2,33 @@
 
 import { Table as LayoutTable, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { DataTablePagination } from "@/components/table/DataTablePagination";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
-// You can use a Zod schema here if you want.
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps<T> {
+  columns: ColumnDef<T>[];
+  data: T[];
+  filterOptions: {
+    key: keyof T;
+    label: string;
+  };
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<T>({ columns, data, filterOptions }: DataTableProps<T>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
@@ -27,6 +39,21 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
   return (
     <div className="w-full">
+      {filterOptions && (
+        <div
+          className={cn("flex justify-end items-center mb-4 md:mb-8", {
+            hidden: !filterOptions,
+          })}
+        >
+          <Input
+            type="text"
+            placeholder={filterOptions?.label ?? "Type for filtering dataset.."}
+            className="max-w-[256px]"
+            value={(table.getColumn(filterOptions.key as string)?.getFilterValue() as string) ?? ""}
+            onChange={(e) => table.getColumn(filterOptions?.key as string)?.setFilterValue(e.target.value) ?? ""}
+          />
+        </div>
+      )}
       <div className="rounded-md border w-full">
         <LayoutTable>
           <TableHeader>
