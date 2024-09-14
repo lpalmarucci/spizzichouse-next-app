@@ -1,5 +1,5 @@
 import { connectToDb } from "@/lib/mongoose";
-import User from "@/lib/models/user.model";
+import UserSchema, { User } from "@/lib/models/user.model";
 
 interface CreateUserDto {
   id: string;
@@ -13,7 +13,7 @@ export async function createUser(user: CreateUserDto) {
   try {
     await connectToDb();
 
-    await User.create(user);
+    await UserSchema.create(user);
   } catch (error: any) {
     throw new Error(`Error while saving user: ${error.message}`);
   }
@@ -23,7 +23,7 @@ export async function getUser(userId: string): Promise<User | null> {
   try {
     await connectToDb();
 
-    return User.findOne({ id: userId });
+    return UserSchema.findOne({ id: userId });
   } catch (error: any) {
     throw new Error(`Error while getting user: ${error.message}`);
   }
@@ -33,7 +33,7 @@ export async function getUsers(): Promise<User[]> {
   try {
     await connectToDb();
 
-    return User.find();
+    return UserSchema.find();
   } catch (error: any) {
     throw new Error(`Error while getting users: ${error.message}`);
   }

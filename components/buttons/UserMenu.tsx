@@ -20,7 +20,6 @@ export default function UserMenu() {
 
   if (!isSignedIn) return;
 
-  console.log({ user });
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

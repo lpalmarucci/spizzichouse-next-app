@@ -27,7 +27,7 @@ export default async function RootLayout({
         <body className={inter.className}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <Header />
-            <main className="w-full mx-auto flex py-8 px-4 lg:px-0 max-w-5xl">{children}</main>
+            <main className="w-full mx-auto flex py-8 px-4 lg:px-0 max-w-6xl">{children}</main>
             <Toaster />
           </ThemeProvider>
         </body>
