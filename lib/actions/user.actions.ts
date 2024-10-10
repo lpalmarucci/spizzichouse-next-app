@@ -1,5 +1,6 @@
 import { connectToDb } from "@/lib/mongoose";
 import UserSchema, { User } from "@/lib/models/user.model";
+import db from "@/lib/db";
 
 interface CreateUserDto {
   id: string;
@@ -33,7 +34,7 @@ export async function getUsers(): Promise<User[]> {
   try {
     await connectToDb();
 
-    return UserSchema.find();
+    return db.users.findMany();
   } catch (error: any) {
     throw new Error(`Error while getting users: ${error.message}`);
   }
